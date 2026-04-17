@@ -62,18 +62,15 @@ export function LoginPage() {
 
     setSubmitting(true)
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password })
+      const { error } = await supabase.auth.signUp({ email, password })
       if (error) throw error
 
-      // Nếu session có ngay = email confirmation đã tắt → đăng nhập luôn
-      if (data.session) {
-        setSuccessMsg('Đăng ký thành công! Đang vào hệ thống...')
-        return
-      }
-
-      // Nếu chưa có session = cần xác nhận email
-      setSuccessMsg('Đăng ký thành công! Vui lòng kiểm tra email để xác nhận tài khoản, sau đó quay lại đăng nhập.')
+      // Luôn chuyển sang tab đăng nhập sau khi tạo tài khoản
       setTab('login')
+      setSuccessMsg('Tạo tài khoản thành công! Vui lòng đăng nhập.')
+      setEmail('')
+      setPassword('')
+      setConfirmPassword('')
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Đăng ký thất bại, thử lại'
       setError(msg === 'User already registered' ? 'Email này đã được đăng ký' : msg)
@@ -141,6 +138,11 @@ export function LoginPage() {
                   placeholder="••••••••"
                   required
                 />
+                {successMsg && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
+                    {successMsg}
+                  </div>
+                )}
                 {error && <ErrorBox message={error} />}
                 <Button type="submit" loading={submitting} className="w-full justify-center py-2.5">
                   Đăng nhập
