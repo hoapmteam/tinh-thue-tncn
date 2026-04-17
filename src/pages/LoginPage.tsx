@@ -65,7 +65,9 @@ export function LoginPage() {
       const { error } = await supabase.auth.signUp({ email, password })
       if (error) throw error
 
-      // Luôn chuyển sang tab đăng nhập sau khi tạo tài khoản
+      // Sign out immediately so auto-session doesn't redirect to dashboard
+      await supabase.auth.signOut()
+
       setTab('login')
       setSuccessMsg('Tạo tài khoản thành công! Vui lòng đăng nhập.')
       setEmail('')
