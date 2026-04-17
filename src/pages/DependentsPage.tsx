@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import type { NhanVien, NguoiPhuThuoc } from '../types'
 import { useNhanVien } from '../hooks/useNhanVien'
 import { useNguoiPhuThuoc } from '../hooks/useNguoiPhuThuoc'
@@ -105,6 +106,13 @@ export function DependentsPage() {
           <div className="overflow-y-auto flex-1 max-h-96">
             {loadingEmp ? (
               <div className="flex justify-center py-8"><Spinner /></div>
+            ) : filteredEmp.length === 0 && !loadingEmp ? (
+              <div className="p-4 text-center">
+                <p className="text-sm text-gray-500 mb-3">Chưa có nhân viên nào</p>
+                <Link to="/nhan-vien">
+                  <Button size="sm" variant="secondary">Đi đến Nhân viên →</Button>
+                </Link>
+              </div>
             ) : filteredEmp.map(emp => (
               <button
                 key={emp.id}
@@ -140,7 +148,26 @@ export function DependentsPage() {
               {loading ? (
                 <div className="flex justify-center py-12"><Spinner /></div>
               ) : dependents.length === 0 ? (
-                <div className="text-center py-12 text-gray-400 text-sm">Chưa có người phụ thuộc</div>
+                <div className="p-6">
+                  <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+                    <h4 className="font-semibold text-blue-800 text-sm mb-2">Hướng dẫn khai báo người phụ thuộc</h4>
+                    <ul className="text-xs text-blue-700 space-y-1.5">
+                      <li>• Nhấn <strong>+ Thêm</strong> để thêm con, vợ/chồng, cha/mẹ được giảm trừ</li>
+                      <li>• Điền <strong>từ tháng/năm</strong> bắt đầu tính giảm trừ</li>
+                      <li>• Nếu đã hết giảm trừ (ví dụ con đã 18 tuổi), điền thêm "đến tháng/năm"</li>
+                      <li>• Mỗi người phụ thuộc hợp lệ được giảm trừ <strong>4.400.000đ/tháng</strong></li>
+                    </ul>
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-4 text-xs text-gray-600">
+                    <p className="font-medium text-gray-700 mb-2">Ví dụ người phụ thuộc hợp lệ:</p>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between"><span>Con dưới 18 tuổi</span><span className="text-green-600">✓ Hợp lệ</span></div>
+                      <div className="flex justify-between"><span>Con học đại học (dưới 25 tuổi)</span><span className="text-green-600">✓ Hợp lệ</span></div>
+                      <div className="flex justify-between"><span>Cha/Mẹ không có thu nhập</span><span className="text-green-600">✓ Hợp lệ</span></div>
+                      <div className="flex justify-between"><span>Vợ/Chồng không có thu nhập</span><span className="text-green-600">✓ Hợp lệ</span></div>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">

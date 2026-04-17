@@ -131,19 +131,94 @@ export function TaxCalculationPage() {
       </div>
 
       {step === 'import' && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 max-w-xl">
-          <TaxImport
-            thang={thang}
-            nam={nam}
-            onThangNamChange={(t, n) => { setThang(t); setNam(n) }}
-            onParsed={handleParsed}
-          />
-          {calculating && (
-            <div className="mt-4 flex items-center justify-center gap-2 text-blue-600">
-              <Spinner size="sm" />
-              <span className="text-sm">Đang tính thuế...</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <TaxImport
+              thang={thang}
+              nam={nam}
+              onThangNamChange={(t, n) => { setThang(t); setNam(n) }}
+              onParsed={handleParsed}
+            />
+            {calculating && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-blue-600">
+                <Spinner size="sm" />
+                <span className="text-sm">Đang tính thuế...</span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <h3 className="font-semibold text-blue-800 text-sm mb-3">Định dạng file Excel</h3>
+              <p className="text-xs text-blue-700 mb-3">File cần có các cột (tên cột không phân biệt hoa/thường):</p>
+              <div className="bg-white rounded-lg border border-blue-200 overflow-hidden text-xs">
+                <table className="w-full">
+                  <thead className="bg-blue-600 text-white">
+                    <tr>
+                      <th className="px-3 py-2 text-left">Tên cột</th>
+                      <th className="px-3 py-2 text-left">Ý nghĩa</th>
+                      <th className="px-3 py-2 text-center">Bắt buộc</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-blue-50">
+                    {[
+                      { col: 'MaNV', desc: 'Mã nhân viên', req: true },
+                      { col: 'HoTen', desc: 'Họ và tên', req: true },
+                      { col: 'TongThuNhap', desc: 'Tổng thu nhập (VND)', req: true },
+                      { col: 'KhacChiuThue', desc: 'Khoản không chịu thuế', req: false },
+                      { col: 'BaoHiem', desc: 'Bảo hiểm (BHXH, BHYT...)', req: false },
+                    ].map(r => (
+                      <tr key={r.col} className="text-gray-700">
+                        <td className="px-3 py-2 font-mono font-bold text-blue-700">{r.col}</td>
+                        <td className="px-3 py-2">{r.desc}</td>
+                        <td className="px-3 py-2 text-center">{r.req ? <span className="text-red-500">✓</span> : <span className="text-gray-400">–</span>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          )}
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <h3 className="font-semibold text-gray-700 text-sm mb-3">Ví dụ dữ liệu trong file</h3>
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden text-xs">
+                <table className="w-full">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      {['MaNV', 'HoTen', 'TongThuNhap', 'KhacChiuThue', 'BaoHiem'].map(h => (
+                        <th key={h} className="px-2 py-2 text-left font-mono text-gray-600">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    <tr className="text-gray-600">
+                      <td className="px-2 py-1.5">NV001</td>
+                      <td className="px-2 py-1.5">Nguyễn Văn An</td>
+                      <td className="px-2 py-1.5">25000000</td>
+                      <td className="px-2 py-1.5">0</td>
+                      <td className="px-2 py-1.5">1750000</td>
+                    </tr>
+                    <tr className="text-gray-600 bg-gray-50/50">
+                      <td className="px-2 py-1.5">NV002</td>
+                      <td className="px-2 py-1.5">Trần Thị Bích</td>
+                      <td className="px-2 py-1.5">40000000</td>
+                      <td className="px-2 py-1.5">0</td>
+                      <td className="px-2 py-1.5">2800000</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800">
+              <p className="font-semibold mb-1">Lưu ý quan trọng:</p>
+              <ul className="space-y-1">
+                <li>• Mã NV phải khớp với mã trong danh sách nhân viên</li>
+                <li>• Số tiền nhập theo đơn vị <strong>đồng</strong>, không dùng dấu phẩy/chấm</li>
+                <li>• Người phụ thuộc đã khai báo sẽ được tự động tính vào giảm trừ</li>
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 

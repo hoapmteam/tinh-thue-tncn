@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/Badge'
 import { Spinner } from '../components/ui/Spinner'
 import { EmployeeForm } from '../components/employees/EmployeeForm'
 import { EmployeeImport } from '../components/employees/EmployeeImport'
+import { loadDemoEmployees } from '../lib/demoData'
 
 export function EmployeesPage() {
   const { loading, fetchAll, create, update, remove, importBatch } = useNhanVien()
@@ -21,6 +22,7 @@ export function EmployeesPage() {
   const [editing, setEditing] = useState<NhanVien | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<NhanVien | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [loadingDemo, setLoadingDemo] = useState(false)
 
   const load = useCallback(async () => {
     const data = await fetchAll(true)
@@ -28,6 +30,19 @@ export function EmployeesPage() {
   }, [fetchAll])
 
   useEffect(() => { load() }, [load])
+
+  async function handleLoadDemo() {
+    setLoadingDemo(true)
+    try {
+      const count = await loadDemoEmployees()
+      showToast(`Đã tải ${count} nhân viên mẫu vào hệ thống`, 'success')
+      load()
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Lỗi tải dữ liệu mẫu', 'error')
+    } finally {
+      setLoadingDemo(false)
+    }
+  }
 
   const filtered = employees.filter(e => {
     const matchSearch = !search ||
@@ -120,9 +135,92 @@ export function EmployeesPage() {
 
         {loading ? (
           <div className="flex justify-center py-16"><Spinner /></div>
+        ) : employees.length === 0 ? (
+          <div className="p-8">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Chưa có nhân viên nào</h3>
+                <p className="text-gray-500 text-sm">Bắt đầu bằng cách thêm nhân viên hoặc tải dữ liệu mẫu để xem thử</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">📋</span>
+                    <div>
+                      <h4 className="font-semibold text-blue-800 text-sm mb-2">Cách 1: Import từ Excel</h4>
+                      <p className="text-xs text-blue-700 mb-2">Nhấn "Import Excel" và tải lên file với các cột:</p>
+                      <div className="bg-white rounded-lg p-2 text-xs font-mono text-gray-700 border border-blue-200">
+                        <div className="grid grid-cols-2 gap-1">
+                          <span className="font-bold text-blue-600">MaNV</span><span>NV001</span>
+                          <span className="font-bold text-blue-600">HoTen</span><span>Nguyễn Văn A</span>
+                          <span className="font-bold text-blue-600">DonVi</span><span>Kế toán</span>
+                          <span className="font-bold text-blue-600">MaSoThue</span><span>0123456789</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">✏️</span>
+                    <div>
+                      <h4 className="font-semibold text-green-800 text-sm mb-2">Cách 2: Thêm thủ công</h4>
+                      <p className="text-xs text-green-700 mb-2">Nhấn "+ Thêm nhân viên" và điền thông tin:</p>
+                      <ul className="text-xs text-green-700 space-y-1">
+                        <li>• Mã nhân viên (bắt buộc, duy nhất)</li>
+                        <li>• Họ tên đầy đủ</li>
+                        <li>• Đơn vị / phòng ban</li>
+                        <li>• Mã số thuế cá nhân</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">💡</span>
+                  <div>
+                    <h4 className="font-semibold text-amber-800 text-sm mb-1">Gợi ý quy trình làm việc</h4>
+                    <div className="flex items-center gap-2 text-xs text-amber-700 flex-wrap">
+                      <span className="bg-amber-200 rounded px-2 py-1">1. Thêm nhân viên</span>
+                      <span>→</span>
+                      <span className="bg-amber-200 rounded px-2 py-1">2. Khai báo người phụ thuộc</span>
+                      <span>→</span>
+                      <span className="bg-amber-200 rounded px-2 py-1">3. Import lương hàng tháng</span>
+                      <span>→</span>
+                      <span className="bg-amber-200 rounded px-2 py-1">4. Tính & lưu thuế</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button loading={loadingDemo} variant="secondary" onClick={handleLoadDemo}>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Tải dữ liệu mẫu (5 NV)
+                </Button>
+                <Button onClick={() => { setEditing(null); setFormOpen(true) }}>
+                  + Thêm nhân viên đầu tiên
+                </Button>
+                <Button variant="secondary" onClick={() => setImportOpen(true)}>
+                  Import từ Excel
+                </Button>
+              </div>
+            </div>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 text-gray-400">
-            <p className="text-lg">Không có nhân viên nào</p>
+            <p className="text-lg">Không tìm thấy nhân viên phù hợp</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

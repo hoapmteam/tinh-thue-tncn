@@ -40,6 +40,7 @@ export function useNhanVien() {
   }, [])
 
   const importBatch = useCallback(async (rows: ExcelNhanVienRow[]) => {
+    const { data: { user } } = await supabase.auth.getUser()
     const records = rows.map(r => ({
       ma_nv: r.MaNV,
       ho_ten: r.HoTen,
@@ -47,8 +48,9 @@ export function useNhanVien() {
       ma_so_thue: r.MaSoThue ?? null,
       cccd: r.CCCD ?? null,
       nghi_viec: false,
+      created_by: user?.id,
     }))
-    const { error } = await supabase.from('nhan_vien').upsert(records, { onConflict: 'ma_nv' })
+    const { error } = await supabase.from('nhan_vien').upsert(records, { onConflict: 'ma_nv,created_by' })
     if (error) throw error
   }, [])
 
