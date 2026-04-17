@@ -35,6 +35,9 @@ export function useNhanVien() {
   }, [])
 
   const remove = useCallback(async (id: string) => {
+    // Delete tax history first (FK is RESTRICT, not CASCADE)
+    const { error: lstError } = await supabase.from('lich_su_thue').delete().eq('nhan_vien_id', id)
+    if (lstError) throw lstError
     const { error } = await supabase.from('nhan_vien').delete().eq('id', id)
     if (error) throw error
   }, [])

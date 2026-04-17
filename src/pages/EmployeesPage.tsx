@@ -303,7 +303,7 @@ export function EmployeesPage() {
         <div className="space-y-4">
           <p className="text-sm text-gray-600">
             Bạn có chắc muốn xóa nhân viên <strong>{confirmDelete?.ho_ten}</strong>?
-            Tất cả người phụ thuộc của nhân viên này cũng sẽ bị xóa.
+            Tất cả người phụ thuộc và lịch sử thuế của nhân viên này cũng sẽ bị xóa.
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setConfirmDelete(null)}>Hủy</Button>
